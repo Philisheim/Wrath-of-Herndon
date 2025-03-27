@@ -2,47 +2,90 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     CharacterController controller;
     private Vector3 moveDirection;
+
     [Tooltip("Set the player's walking speed")]
     public float moveSpeed = 5;
+
     [Tooltip("Player's max and starting stamina")]
     public float stamina = 50;
+
     [Tooltip("Rate that stamina drains")]
     public float staminaDrainRate = 10;
-    [Tooltip("Rate that stamina regenerates")]
+
+    [Tooltip("Base rate that stamina regenerates")]
     public float staminaGainRate = 2;
-    public TMP_Text staminaDisplay;
+
+    [Tooltip("Time delay before stamina starts regenerating after sprinting (seconds)")]
+    public float staminaRegenDelay = 2f;
+
+    [Tooltip("Additional stamina regen per second after delay")]
+    public float staminaRegenIncrease = 0.5f;
+
+    public float speed;
+    public float speedEffect;
+
     private float maxStamina;
-    // Start is called before the first frame update
+    private float staminaRegenTimer = 0f;
+    private float regenMultiplier = 1f;
+    public Slider FillEffect;
+    public Slider Fill;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         maxStamina = stamina;
+        Fill.maxValue = maxStamina;
+        FillEffect.maxValue = maxStamina;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        moveDirection.Normalize();
+        if (stamina == maxStamina)
+        {
+            FillEffect.value = 100;
+            Fill.value = 100;
+        }
+        else
+        {
+            float target = Mathf.Lerp(Fill.value, stamina, speed * Time.deltaTime);
+            float targetEffect = Mathf.Lerp(FillEffect.value, stamina, speedEffect * Time.deltaTime);
+
+            Fill.value = target;
+            FillEffect.value = targetEffect;
+        }
+
         moveDirection.y = -0.5f;
-        if(Input.GetKey((KeyCode.LeftShift)) && stamina > 0)
+
+        if (Input.GetKey(KeyCode.LeftShift) && stamina > 0 && controller.velocity.magnitude > 0.1f)
         {
             moveSpeed = 10;
-            stamina -= staminaDrainRate * Time.deltaTime; 
+            stamina -= staminaDrainRate * Time.deltaTime;
+            staminaRegenTimer = 0f;
+            regenMultiplier = 1f;
         }
         else
         {
             moveSpeed = 5;
-            if(stamina < maxStamina)
+
+            if (stamina < maxStamina)
             {
-                stamina += staminaGainRate * Time.deltaTime;
+                staminaRegenTimer += Time.deltaTime;
+
+                if (staminaRegenTimer >= staminaRegenDelay)
+                {
+                    regenMultiplier += staminaRegenIncrease * Time.deltaTime;
+                    stamina += (staminaGainRate * regenMultiplier) * Time.deltaTime;
+                    stamina = Mathf.Min(stamina, maxStamina);
+                }
             }
         }
-        staminaDisplay.text = Mathf.RoundToInt(stamina).ToString();
+
         controller.Move(moveDirection * moveSpeed * Time.deltaTime);
     }
 
@@ -59,5 +102,4 @@ public class Player : MonoBehaviour
 
         moveDirection = (forwardInput * forward) + (rightInput * right);
     }
-
 }

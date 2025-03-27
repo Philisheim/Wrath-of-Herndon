@@ -8,9 +8,9 @@ public class FirstPersonCamera : MonoBehaviour
     private float xAxis;
     private float yAxis;
     [Tooltip("X-axis turn rate in degrees")]
-    public float xAxisTurnRate = 180f;
+    public float xAxisTurnRate = 520f;
     [Tooltip("Y-axis turn rate in degrees")]
-    public float yAxisTurnRate = 180f;
+    public float yAxisTurnRate = 520f;
 
     // Start is called before the first frame update
     void Start()
