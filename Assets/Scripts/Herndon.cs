@@ -32,7 +32,7 @@ public class Herndon : MonoBehaviour
     [Header("Rage Settings")]
     public float maxRage = 100f;
     public float rageDecreaseRate = 5f;
-    
+
     public float currentRage = 0f;
     private bool isEnraged = false;
 
@@ -40,15 +40,22 @@ public class Herndon : MonoBehaviour
     private Vector3 investigateTarget;
     private bool hasInvestigateTarget = false;
 
+    [Header("Search settings")]
     private Vector3 lastSeenPlayerPos;
     private bool isSearching = false;
-    private float searchTime = 5f;
+    public float searchTime = 5f;
     private float searchTimer = 0f;
 
     private float originalWalkSpeed;
     private float originalRunSpeed;
     private float originalSightRange;
     private float originalHearingRange;
+
+    [Header("Roam settings")]
+    private List<Vector3> visitedLocations = new List<Vector3>();
+    private List<Vector3> navMeshPoints = new List<Vector3>(); // Store precomputed NavMesh points
+    private float roamTimer = 0f;
+    public float roamInterval = 30f; // Time interval to change roam target
 
     void Start()
     {
@@ -67,11 +74,19 @@ public class Herndon : MonoBehaviour
         rageHearing = hearingRange + rageHearingIncrease;
         rageWalk = walkSpeed + rageWalkIncrease;
         rageRun = runSpeed + rageRunIncrease;
-    }
 
+        PrecomputeNavMeshPoints(); // Precompute NavMesh points for roaming
+    }
 
     void Update()
     {
+        roamTimer += Time.deltaTime;
+        if (roamTimer >= roamInterval)
+        {
+            roamTimer = 0f;
+            SetNewRoamDestination();
+        }
+
         switch (currentState)
         {
             case EnemyState.Roaming:
@@ -93,6 +108,20 @@ public class Herndon : MonoBehaviour
 
         CheckForPlayer();
         HandleRage();
+        ClampSpeed(); // Ensure speed is clamped every frame
+    }
+
+    void ClampSpeed()
+    {
+        // Clamp the speed to prevent exceeding the intended limits
+        if (currentState == EnemyState.Roaming || currentState == EnemyState.Searching || currentState == EnemyState.Investigating)
+        {
+            agent.speed = Mathf.Min(agent.speed, isEnraged ? rageWalk : originalWalkSpeed);
+        }
+        else if (currentState == EnemyState.Chasing || currentState == EnemyState.Enraged)
+        {
+            agent.speed = Mathf.Min(agent.speed, isEnraged ? rageRun : originalRunSpeed);
+        }
     }
 
     // ---------------- Roaming Logic ----------------
@@ -107,15 +136,58 @@ public class Herndon : MonoBehaviour
 
     void SetNewRoamDestination()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * 10f;
-        randomDirection += transform.position;
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(randomDirection, out hit, 10f, NavMesh.AllAreas))
+        roamTarget = GetRandomNavMeshLocation();
+        agent.SetDestination(roamTarget);
+
+        // Store the location if it's a valid point
+        if (Vector3.Distance(transform.position, roamTarget) > 2f)
         {
-            roamTarget = hit.position;
-            agent.SetDestination(roamTarget);
+            visitedLocations.Add(roamTarget);
+
+            // Keep the list size manageable
+            if (visitedLocations.Count > 10)
+            {
+                visitedLocations.RemoveAt(0);
+            }
         }
     }
+
+    Vector3 GetRandomNavMeshLocation()
+    {
+        if (navMeshPoints.Count == 0)
+        {
+            // If no NavMesh points are available, return the current position
+            return transform.position;
+        }
+
+        // Ensure the index is within bounds
+        int randomIndex = Random.Range(0, navMeshPoints.Count);
+        Vector3 chosenPoint = navMeshPoints[randomIndex];
+
+        // Avoid recently visited locations
+        if (!visitedLocations.Contains(chosenPoint))
+        {
+            return chosenPoint;
+        }
+
+        // If all points are visited, fall back to the current position or try again
+        return transform.position; // or you could call GetRandomNavMeshLocation() again
+    }
+
+    void PrecomputeNavMeshPoints()
+    {
+        NavMeshTriangulation navMeshData = NavMesh.CalculateTriangulation();
+
+        foreach (Vector3 vertex in navMeshData.vertices)
+        {
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(vertex, out hit, 1f, NavMesh.AllAreas))
+            {
+                navMeshPoints.Add(hit.position);
+            }
+        }
+    }
+
 
     // ---------------- Chasing Logic ----------------
     void CheckForPlayer()
@@ -152,7 +224,6 @@ public class Herndon : MonoBehaviour
         }
     }
 
-
     void ChasePlayer()
     {
         agent.speed = runSpeed;
@@ -170,8 +241,6 @@ public class Herndon : MonoBehaviour
         }
     }
 
-
-
     // ---------------- Searching Logic ----------------
     void StartSearching()
     {
@@ -183,7 +252,6 @@ public class Herndon : MonoBehaviour
             SetNewSearchDestination();
         }
     }
-
 
     void SearchArea()
     {
@@ -208,8 +276,6 @@ public class Herndon : MonoBehaviour
         CheckForPlayer();
     }
 
-
-
     void SetNewSearchDestination()
     {
         Vector3 randomDirection = Random.insideUnitSphere * 5f;
@@ -233,7 +299,6 @@ public class Herndon : MonoBehaviour
         }
     }
 
-
     void Investigate()
     {
         agent.speed = walkSpeed;
@@ -251,7 +316,7 @@ public class Herndon : MonoBehaviour
     // ---------------- Rage Logic ----------------
     public void AddRage(float amount)
     {
-        if(currentRage < maxRage)
+        if (currentRage < maxRage)
         {
             currentRage += amount;
         }
@@ -326,7 +391,6 @@ public class Herndon : MonoBehaviour
         return false;
     }
 
-
     void EnragedBehavior()
     {
         if (player != null)
@@ -348,5 +412,4 @@ public class Herndon : MonoBehaviour
             ExitEnragedState();
         }
     }
-
 }
