@@ -18,15 +18,22 @@ public class Herndon : MonoBehaviour
     [Header("Detection Settings")]
     public float sightRange = 15f;
     public float hearingRange = 25f;
-    public float rageSightIncrease = 10f;
-    public float rageHearingIncrease = 15f;
+    public float rageSight;
+    public float rageHearing;
+    public float rageWalk;
+    public float rageRun;
+    public float rageSightIncrease;
+    public float rageHearingIncrease;
+    public float rageWalkIncrease;
+    public float rageRunIncrease;
     public LayerMask playerLayer;
     public LayerMask obstacleLayer;
 
     [Header("Rage Settings")]
     public float maxRage = 100f;
     public float rageDecreaseRate = 5f;
-    private float currentRage = 0f;
+    
+    public float currentRage = 0f;
     private bool isEnraged = false;
 
     private Vector3 roamTarget;
@@ -55,6 +62,11 @@ public class Herndon : MonoBehaviour
         originalRunSpeed = runSpeed;
         originalSightRange = sightRange;
         originalHearingRange = hearingRange;
+        // Set the rage values
+        rageSight = sightRange + rageSightIncrease;
+        rageHearing = hearingRange + rageHearingIncrease;
+        rageWalk = walkSpeed + rageWalkIncrease;
+        rageRun = runSpeed + rageRunIncrease;
     }
 
 
@@ -110,16 +122,29 @@ public class Herndon : MonoBehaviour
     {
         if (player == null) return;
 
-        Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        if (Physics.Raycast(transform.position, directionToPlayer, out RaycastHit hit, sightRange, playerLayer | obstacleLayer))
+        // Check if player is within sight range and not obstructed
+        bool playerVisible = false;
+        Collider[] hits = Physics.OverlapSphere(transform.position, sightRange, playerLayer);
+
+        foreach (var hit in hits)
         {
-            if (hit.collider.CompareTag("Player"))
+            if (hit.CompareTag("Player"))
             {
-                lastSeenPlayerPos = player.position;
-                isSearching = false;
-                searchTimer = 0f;
-                currentState = EnemyState.Chasing;
+                Vector3 directionToPlayer = (player.position - transform.position).normalized;
+                if (!Physics.Raycast(transform.position, directionToPlayer, Vector3.Distance(transform.position, player.position), obstacleLayer))
+                {
+                    playerVisible = true;
+                    break;
+                }
             }
+        }
+
+        if (playerVisible)
+        {
+            lastSeenPlayerPos = player.position;
+            isSearching = false;
+            searchTimer = 0f;
+            currentState = EnemyState.Chasing;
         }
         else if (currentState == EnemyState.Chasing)
         {
@@ -127,35 +152,43 @@ public class Herndon : MonoBehaviour
         }
     }
 
+
     void ChasePlayer()
     {
         agent.speed = runSpeed;
 
-        // If the player is still present, continue chasing
         if (player != null)
         {
             agent.SetDestination(player.position);
+            AddRage(20f * Time.deltaTime);
+        }
 
-            // Increase rage over time while chasing
-            AddRage(20f * Time.deltaTime); // Increase rage by 20 per second
+        // If the enemy reaches the last known player position, start searching
+        if (Vector3.Distance(transform.position, lastSeenPlayerPos) < 2f)
+        {
+            StartSearching();
         }
     }
+
 
 
     // ---------------- Searching Logic ----------------
     void StartSearching()
     {
-        isSearching = true;
-        searchTimer = 0f;
-        currentState = EnemyState.Searching;
-        SetNewSearchDestination();
+        if (!isSearching) // Prevent unnecessary resets
+        {
+            isSearching = true;
+            searchTimer = 0f;
+            currentState = EnemyState.Searching;
+            SetNewSearchDestination();
+        }
     }
+
 
     void SearchArea()
     {
         agent.speed = walkSpeed;
 
-        // If enemy reaches the search target, pick a new one
         if (Vector3.Distance(transform.position, roamTarget) < 2f)
         {
             SetNewSearchDestination();
@@ -163,7 +196,6 @@ public class Herndon : MonoBehaviour
 
         searchTimer += Time.deltaTime;
 
-        // If the timer runs out, go back to roaming
         if (searchTimer >= searchTime)
         {
             isSearching = false;
@@ -172,22 +204,10 @@ public class Herndon : MonoBehaviour
             SetNewRoamDestination();
         }
 
-        // If the enemy sees the player while searching, switch to chasing
-        if (player != null)
-        {
-            Vector3 directionToPlayer = (player.position - transform.position).normalized;
-            if (Physics.Raycast(transform.position, directionToPlayer, out RaycastHit hit, sightRange, playerLayer | obstacleLayer))
-            {
-                if (hit.collider.CompareTag("Player"))
-                {
-                    lastSeenPlayerPos = player.position;
-                    isSearching = false;
-                    searchTimer = 0f;
-                    currentState = EnemyState.Chasing;
-                }
-            }
-        }
+        // Check if the player is now visible again
+        CheckForPlayer();
     }
+
 
 
     void SetNewSearchDestination()
@@ -231,7 +251,14 @@ public class Herndon : MonoBehaviour
     // ---------------- Rage Logic ----------------
     public void AddRage(float amount)
     {
-        currentRage += amount;
+        if(currentRage < maxRage)
+        {
+            currentRage += amount;
+        }
+        else if (currentRage > maxRage && !isEnraged)
+        {
+            currentRage = maxRage;
+        }
         // If rage reaches 100%, apply the enraged state
         if (currentRage >= maxRage)
         {
@@ -242,7 +269,7 @@ public class Herndon : MonoBehaviour
     public void ReduceRage(float amount)
     {
         currentRage = Mathf.Max(0, currentRage - amount);
-        if (currentRage < maxRage && isEnraged)
+        if (currentRage <= (0.75 * maxRage) && isEnraged)
         {
             ExitEnragedState();
         }
@@ -251,22 +278,54 @@ public class Herndon : MonoBehaviour
     void EnterEnragedState()
     {
         isEnraged = true;
-        sightRange += rageSightIncrease;
-        hearingRange += rageHearingIncrease;
-        walkSpeed += 2.5f;
-        runSpeed += 2.5f;
+        sightRange = rageSight;
+        hearingRange = rageHearing;
+        walkSpeed = rageWalk;
+        runSpeed = rageRun;
         currentState = EnemyState.Enraged;
     }
 
     void ExitEnragedState()
     {
         isEnraged = false;
-        sightRange -= rageSightIncrease;
-        hearingRange -= rageHearingIncrease;
-        walkSpeed -= 2.5f;
-        runSpeed -= 2.5f;
-        currentState = EnemyState.Roaming;
+        sightRange = originalSightRange;
+        hearingRange = originalHearingRange;
+        walkSpeed = originalWalkSpeed;
+        runSpeed = originalRunSpeed;
+
+        // If the player is still visible, chase; otherwise, return to normal behavior
+        bool playerStillVisible = CanSeePlayer();
+
+        if (playerStillVisible)
+        {
+            currentState = EnemyState.Chasing;
+        }
+        else
+        {
+            StartSearching(); // Start searching instead of immediately roaming
+        }
     }
+
+    bool CanSeePlayer()
+    {
+        if (player == null) return false;
+
+        Collider[] hits = Physics.OverlapSphere(transform.position, sightRange, playerLayer);
+
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("Player"))
+            {
+                Vector3 directionToPlayer = (player.position - transform.position).normalized;
+                if (!Physics.Raycast(transform.position, directionToPlayer, Vector3.Distance(transform.position, player.position), obstacleLayer))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     void EnragedBehavior()
     {

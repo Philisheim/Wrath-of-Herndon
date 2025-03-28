@@ -1867,7 +1867,7 @@ Transform:
   m_GameObject: {fileID: 1477029823}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.42, y: 1, z: 6.17}
+  m_LocalPosition: {x: 1.42, y: 1, z: 19.83}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1910,9 +1910,15 @@ MonoBehaviour:
   walkSpeed: 3.5
   runSpeed: 6
   sightRange: 30
-  hearingRange: 50
-  rageSightIncrease: 10
-  rageHearingIncrease: 15
+  hearingRange: 45
+  rageSight: 0
+  rageHearing: 0
+  rageWalk: 0
+  rageRun: 0
+  rageSightIncrease: 20
+  rageHearingIncrease: 25
+  rageWalkIncrease: 2.5
+  rageRunIncrease: 10
   playerLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -1921,6 +1927,7 @@ MonoBehaviour:
     m_Bits: 8
   maxRage: 100
   rageDecreaseRate: 5
+  currentRage: 0
 --- !u!1 &1515150149
 GameObject:
   m_ObjectHideFlags: 0
@@ -3298,6 +3305,10 @@ PrefabInstance:
       propertyPath: FillEffect
       value: 
       objectReference: {fileID: 1073071367}
+    - target: {fileID: 1682985991570271366, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
+      propertyPath: staminaRegenIncrease
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2604296194494613720, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.23
