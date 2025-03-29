@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3137,6 +3137,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: Herndon (Placeholder)(duh)
       objectReference: {fileID: 0}
+    - target: {fileID: 4355988920425327901, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: m_Height
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4355988920425327901, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4355988920425327901, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4355988920425327901, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4355988920425327901, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: m_ObstacleAvoidanceType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6637767033399819523, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: currentRage
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6637767033399819523, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: rageDecreaseRate
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8917360355586493440, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.42
@@ -3212,7 +3240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2604296194494613720, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.25
+      value: -0.51
       objectReference: {fileID: 0}
     - target: {fileID: 2604296194494613720, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
       propertyPath: m_LocalPosition.y
