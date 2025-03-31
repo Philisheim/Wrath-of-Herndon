@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3170,8 +3170,16 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6637767033399819523, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: walkSpeed
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6637767033399819523, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: currentRage
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6637767033399819523, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: roamInterval
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 6637767033399819523, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: rageDecreaseRate
@@ -3246,6 +3254,14 @@ PrefabInstance:
       propertyPath: FillEffect
       value: 
       objectReference: {fileID: 1073071367}
+    - target: {fileID: 1682985991570271366, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
+      propertyPath: speedEffectGain
+      value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 1682985991570271366, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
+      propertyPath: speedEffectLoss
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 1682985991570271366, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
       propertyPath: staminaRegenIncrease
       value: 1.5

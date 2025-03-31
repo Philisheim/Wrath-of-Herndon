@@ -8,25 +8,23 @@ public class Player : MonoBehaviour
 {
     CharacterController controller;
     private Vector3 moveDirection;
-
+    [Header("Movement settings")]
     [Tooltip("Set the player's walking speed")]
     public float moveSpeed = 5;
 
+    [Header("Stamina settings")]
     [Tooltip("Player's max and starting stamina")]
     public float stamina = 50;
-
     [Tooltip("Rate that stamina drains")]
     public float staminaDrainRate = 10;
-
     [Tooltip("Base rate that stamina regenerates")]
     public float staminaGainRate = 2;
-
     [Tooltip("Time delay before stamina starts regenerating after sprinting (seconds)")]
     public float staminaRegenDelay = 2f;
-
     [Tooltip("Additional stamina regen per second after delay")]
     public float staminaRegenIncrease = 0.5f;
 
+    [Header("Misc/Visual")]
     public float speed;
     public float speedEffect;
 

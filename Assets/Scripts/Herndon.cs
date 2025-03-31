@@ -28,10 +28,10 @@ public class Herndon : MonoBehaviour
     private float rageHearing;
     private float rageWalk;
     private float rageRun;
-    public float rageSightIncrease;   // Extra added to sightRange when enraged
-    public float rageHearingIncrease;
-    public float rageWalkIncrease;
-    public float rageRunIncrease;
+    public float rageSightIncrease;   // Extra sightRange when enraged
+    public float rageHearingIncrease; // Extra hearing range while enraged
+    public float rageWalkIncrease;    // Extra walk speed while enraged
+    public float rageRunIncrease;     // Extra run speed while enraged
     public LayerMask playerLayer;
     public LayerMask obstacleLayer;
 
@@ -46,18 +46,24 @@ public class Herndon : MonoBehaviour
     private bool inRageCooldown = false;
     private float outOfSightTimer = 0f;
     public float rageDecreaseMultiplier = 1f;
+    [Tooltip("Percentage of max rage (default 45%) before rage buffs are lost")]
+    public float rageThreshold = 0.45f; // Default 45%
 
-    // -------- Nudge Cooldown --------
+    // -------- Nudge Settings --------
+    [Header("Nudge Settings")]
+    [Tooltip("Radius around the player from which a nudge target is chosen (default 25 meters).")]
+    public float nudgeRadius = 25f;
     private float nudgeCooldownTimer = 0f;
     private Vector3 lastNudgeTarget;
 
     // -------- Roaming & Searching --------
-    [Header("Roam settings")]
     private Vector3 roamTarget;
     private List<Vector3> visitedLocations = new List<Vector3>();
     private List<Vector3> navMeshPoints = new List<Vector3>(); // Precomputed points
-    private float roamTimer = 0f;
-    public float roamInterval = 30f;
+    [Header("Roam settings")]
+    [Tooltip("Maximum time (in seconds) Herndon can spend trying to roam before changing roam destinations")]
+    public float roamInterval = 90f;
+    public float roamTimer = 0;
 
     // -------- Investigating --------
     private Vector3 investigateTarget;
@@ -65,10 +71,10 @@ public class Herndon : MonoBehaviour
 
     // -------- Searching --------
     [Header("Search settings")]
+    [Tooltip("Radius (in meters) Herndon can search in after losing sight of the player")]
+    public float searchRadius = 10f;
     private Vector3 lastSeenPlayerPos;
     private bool isSearching = false;
-    public float searchTime = 15f; // Duration of search state
-    private float searchTimer = 0f;
 
     // -------- Original Values --------
     private float originalWalkSpeed;
@@ -141,10 +147,19 @@ public class Herndon : MonoBehaviour
     // ======================================================
     void ClampSpeed()
     {
-        if (currentState == EnemyState.Roaming || currentState == EnemyState.Searching || currentState == EnemyState.Investigating)
-            agent.speed = isEnraged ? rageWalk : originalWalkSpeed;
-        else if (currentState == EnemyState.Chasing || currentState == EnemyState.Enraged)
-            agent.speed = isEnraged ? rageRun : originalRunSpeed;
+        // When enraged and above threshold, use buffed speeds.
+        // Otherwise, revert to original speeds.
+        if (isEnraged && currentRage >= rageThreshold * maxRage)
+        {
+            if (currentState == EnemyState.Roaming || currentState == EnemyState.Searching || currentState == EnemyState.Investigating)
+                agent.speed = rageWalk;
+            else if (currentState == EnemyState.Chasing || currentState == EnemyState.Enraged)
+                agent.speed = rageRun;
+        }
+        else
+        {
+            agent.speed = (currentState == EnemyState.Chasing || currentState == EnemyState.Enraged) ? originalRunSpeed : originalWalkSpeed;
+        }
     }
 
     void PrecomputeNavMeshPoints()
@@ -199,7 +214,6 @@ public class Herndon : MonoBehaviour
             if (!isEnraged)
             {
                 isSearching = false;
-                searchTimer = 0f;
                 currentState = EnemyState.Chasing;
             }
         }
@@ -295,26 +309,41 @@ public class Herndon : MonoBehaviour
         }
     }
 
+    // Gets a valid destination within the searchRadius of the last seen position.
+    Vector3 GetFallbackDestination(Vector3 lastKnownPos)
+    {
+        int maxAttempts = 10;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            Vector3 randomOffset = Random.insideUnitSphere * searchRadius;
+            randomOffset.y = 0;
+            Vector3 potentialTarget = lastKnownPos + randomOffset;
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(potentialTarget, out hit, 5f, NavMesh.AllAreas))
+            {
+                return hit.position;
+            }
+        }
+
+        // Fallback if all attempts fail.
+        NavMeshHit fallbackHit;
+        if (NavMesh.SamplePosition(lastKnownPos, out fallbackHit, searchRadius, NavMesh.AllAreas))
+        {
+            return fallbackHit.position;
+        }
+
+        return lastKnownPos;
+    }
+
     void StartSearching()
     {
         if (!isSearching && !isEnraged)
         {
             isSearching = true;
-            searchTimer = searchTime;
             currentState = EnemyState.Searching;
             SetNewSearchDestination();
         }
-    }
-
-    // Gets a valid destination within 5 meters of the last seen position.
-    Vector3 GetFallbackDestination(Vector3 lastKnownPos)
-    {
-        Vector3 randomOffset = Random.insideUnitSphere * 5f;
-        Vector3 target = lastKnownPos + randomOffset;
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(target, out hit, 2f, NavMesh.AllAreas))
-            return hit.position;
-        return lastKnownPos;
     }
 
     void SetNewSearchDestination()
@@ -331,12 +360,10 @@ public class Herndon : MonoBehaviour
         {
             SetNewSearchDestination();
         }
-        searchTimer -= Time.deltaTime;
-        if (searchTimer <= 0f)
+        else
         {
             currentState = EnemyState.Roaming;
             isSearching = false;
-            searchTimer = 0f;
         }
     }
 
@@ -358,19 +385,26 @@ public class Herndon : MonoBehaviour
         }
         currentRage = Mathf.Clamp(currentRage, 0, maxRage);
 
-        if (!inRageCooldown && currentRage >= maxRage)
+        // Rage state transitions:
+        if (!inRageCooldown)
         {
-            currentRage = maxRage;
-            isEnraged = true;
-            currentState = EnemyState.Enraged;
+            // Enter enraged state when rage reaches maximum.
+            if (currentRage >= maxRage)
+            {
+                currentRage = maxRage;
+                isEnraged = true;
+                currentState = EnemyState.Enraged;
+            }
+            // Exit enraged state once rage falls below the threshold.
+            else if (isEnraged && currentRage < rageThreshold * maxRage)
+            {
+                isEnraged = false;
+                inRageCooldown = true;
+                rageCooldownTimer = 5f;
+                currentState = CanSeePlayer() ? EnemyState.Chasing : EnemyState.Searching;
+            }
         }
-        else if (isEnraged && currentRage < 0.7f * maxRage && !inRageCooldown)
-        {
-            isEnraged = false;
-            inRageCooldown = true;
-            rageCooldownTimer = 5f;
-            currentState = EnemyState.Chasing;
-        }
+
         if (inRageCooldown)
         {
             rageCooldownTimer -= Time.deltaTime;
@@ -380,26 +414,51 @@ public class Herndon : MonoBehaviour
                 currentState = CanSeePlayer() ? EnemyState.Chasing : EnemyState.Searching;
             }
         }
+
+        // Ensure a valid state is set if none of the above conditions apply.
+        if (currentState != EnemyState.Roaming &&
+            currentState != EnemyState.Chasing &&
+            currentState != EnemyState.Investigating &&
+            currentState != EnemyState.Searching &&
+            currentState != EnemyState.Enraged)
+        {
+            currentState = CanSeePlayer() ? EnemyState.Chasing : EnemyState.Roaming;
+        }
     }
 
     void EnragedBehavior()
     {
-        runSpeed = rageRun;
-        walkSpeed = rageWalk;
-        sightRange = rageSight;
-        hearingRange = rageHearing;
-        if (player != null)
+        // If the enemy's rage is above the threshold, maintain buffed speeds.
+        if (currentRage >= rageThreshold * maxRage)
         {
-            if (CanSeePlayer())
+            runSpeed = rageRun;
+            walkSpeed = rageWalk;
+            sightRange = rageSight;
+            hearingRange = rageHearing;
+
+            if (player != null)
             {
-                // Chase the player if visible.
-                agent.SetDestination(player.position);
+                if (CanSeePlayer())
+                {
+                    // Chase the player if visible.
+                    agent.SetDestination(player.position);
+                }
+                else
+                {
+                    // Every 2 seconds, nudge the enemy if the cooldown has elapsed.
+                    if (nudgeCooldownTimer <= 0f)
+                    {
+                        NudgeTowardsPlayer();
+                        nudgeCooldownTimer = 2f; // Reset the nudge timer to 2 seconds.
+                    }
+                }
             }
-            else
-            {
-                // Use nudge as the primary method while enraged.
-                NudgeTowardsPlayer();
-            }
+        }
+        else
+        {
+            // Rage has fallen below the threshold, so remove buffs.
+            NormalBehavior();
+            currentState = CanSeePlayer() ? EnemyState.Chasing : EnemyState.Roaming;
         }
     }
 
@@ -415,28 +474,60 @@ public class Herndon : MonoBehaviour
     /// Nudges the enemy toward a target point 45 meters from the player's position.
     /// Adds a random offset if the computed target is nearly identical to the previous one.
     /// </summary>
+    /// <summary>
+    /// Nudges the enemy toward a target point that is closer to the player.
+    /// The target is chosen from within a circle around the player (of radius nudgeRadius).
+    /// If a valid target is not found after a few attempts, the enemy moves directly to the player.
+    /// </summary>
+    /// <summary>
+    /// Nudges the enemy toward a target point that is closer to the player.
+    /// The target is chosen from within a circle around the player (of radius nudgeRadius).
+    /// If a valid target is not found after a few attempts, the enemy moves directly to the player.
+    /// </summary>
     void NudgeTowardsPlayer()
     {
         if (player == null)
             return;
-        if (nudgeCooldownTimer > 0f)
-            return;
-        Vector3 direction = (transform.position - player.position).normalized;
-        Vector3 targetPosition = player.position + direction * 45f;
-        if (Vector3.Distance(targetPosition, lastNudgeTarget) < 1f)
-            targetPosition += Random.insideUnitSphere * 2f;
-        if (Vector3.Distance(targetPosition, agent.destination) < 2f)
-            targetPosition += Random.insideUnitSphere * 2f;
+
+        // Calculate current distance from enemy to player.
+        float currentDistance = Vector3.Distance(transform.position, player.position);
+
+        // We want a target that's closer than currentDistance.
+        Vector3 targetPosition = player.position; // Fallback
+        bool foundValidTarget = false;
+        int maxAttempts = 10;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            // Pick a random point inside a circle of radius nudgeRadius (on XZ plane)
+            Vector2 randomPoint = Random.insideUnitCircle * nudgeRadius;
+            Vector3 potentialTarget = player.position + new Vector3(randomPoint.x, 0, randomPoint.y);
+
+            // Ensure this point is closer to the player than the enemy's current position.
+            if (Vector3.Distance(player.position, potentialTarget) < currentDistance)
+            {
+                targetPosition = potentialTarget;
+                foundValidTarget = true;
+                break;
+            }
+        }
+
+        // If no valid target was found, default to the player's position.
+        if (!foundValidTarget)
+        {
+            targetPosition = player.position;
+        }
+
+        // Validate the chosen target using NavMesh sampling.
         NavMeshHit hit;
-        if (NavMesh.SamplePosition(targetPosition, out hit, 2f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(targetPosition, out hit, 5f, NavMesh.AllAreas))
         {
             agent.SetDestination(hit.position);
             lastNudgeTarget = hit.position;
         }
         else
         {
-            agent.SetDestination(lastSeenPlayerPos);
+            // If sampling fails, set destination directly to the player.
+            agent.SetDestination(player.position);
         }
-        nudgeCooldownTimer = 3f;
     }
 }
