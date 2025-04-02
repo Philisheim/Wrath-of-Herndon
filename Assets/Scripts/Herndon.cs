@@ -13,6 +13,7 @@ public class Herndon : MonoBehaviour
 
     private NavMeshAgent agent;
     private Transform player;
+    private Screen_Shake ss;
 
     // -------- Movement Settings --------
     [Header("Movement Speeds")]
@@ -90,6 +91,7 @@ public class Herndon : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         currentState = EnemyState.Roaming;
+        ss = Camera.main.GetComponent<Screen_Shake>();
         SetNewRoamDestination();
 
         // Cache original movement and detection values.
@@ -385,12 +387,18 @@ public class Herndon : MonoBehaviour
         }
         currentRage = Mathf.Clamp(currentRage, 0, maxRage);
 
-        // Rage state transitions:
         if (!inRageCooldown)
         {
             // Enter enraged state when rage reaches maximum.
-            if (currentRage >= maxRage)
+            // Only trigger screen shake on the transition from non-enraged to enraged.
+            if (!isEnraged && currentRage >= maxRage)
             {
+                // Trigger the screen shake.
+                if (ss != null)
+                {
+                    ss.shake = true; 
+                    ss.Shake();
+                }
                 currentRage = maxRage;
                 isEnraged = true;
                 currentState = EnemyState.Enraged;
@@ -415,7 +423,6 @@ public class Herndon : MonoBehaviour
             }
         }
 
-        // Ensure a valid state is set if none of the above conditions apply.
         if (currentState != EnemyState.Roaming &&
             currentState != EnemyState.Chasing &&
             currentState != EnemyState.Investigating &&
@@ -425,6 +432,7 @@ public class Herndon : MonoBehaviour
             currentState = CanSeePlayer() ? EnemyState.Chasing : EnemyState.Roaming;
         }
     }
+
 
     void EnragedBehavior()
     {
@@ -470,16 +478,6 @@ public class Herndon : MonoBehaviour
         hearingRange = originalHearingRange;
     }
 
-    /// <summary>
-    /// Nudges the enemy toward a target point 45 meters from the player's position.
-    /// Adds a random offset if the computed target is nearly identical to the previous one.
-    /// </summary>
-    /// <summary>
-    /// Nudges the enemy toward a target point that is closer to the player.
-    /// The target is chosen from within a circle around the player (of radius nudgeRadius).
-    /// If a valid target is not found after a few attempts, the enemy moves directly to the player.
-    /// </summary>
-    /// <summary>
     /// Nudges the enemy toward a target point that is closer to the player.
     /// The target is chosen from within a circle around the player (of radius nudgeRadius).
     /// If a valid target is not found after a few attempts, the enemy moves directly to the player.
