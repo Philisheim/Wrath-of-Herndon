@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -100,4 +101,13 @@ public class Player : MonoBehaviour
 
         moveDirection = (forwardInput * forward) + (rightInput * right);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Herndon"))
+        {
+            SceneManager.LoadScene(0);
+        }
+    }
+
 }

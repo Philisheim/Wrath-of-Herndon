@@ -2,14 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
-public class Herndon : MonoBehaviour
+
+namespace WrathOfHerndon
+{
+    public class Herndon : MonoBehaviour
 {
     // ======================================================
     // ================ ENUM & VARIABLES ==================
     // ======================================================
     public enum EnemyState { Roaming, Chasing, Investigating, Searching, Enraged }
     private EnemyState currentState;
+    private EnemyState lastState; // Tracks the previous state
 
     private NavMeshAgent agent;
     private Transform player;
@@ -47,12 +52,12 @@ public class Herndon : MonoBehaviour
     private bool inRageCooldown = false;
     private float outOfSightTimer = 0f;
     public float rageDecreaseMultiplier = 1f;
-    [Tooltip("Percentage of max rage (default 45%) before rage buffs are lost")]
+    [Tooltip("Percentage of max rage before rage buffs are lost.")]
     public float rageThreshold = 0.45f; // Default 45%
 
     // -------- Nudge Settings --------
     [Header("Nudge Settings")]
-    [Tooltip("Radius around the player from which a nudge target is chosen (default 25 meters).")]
+    [Tooltip("Radius around the player from which a nudge target is chosen.")]
     public float nudgeRadius = 25f;
     private float nudgeCooldownTimer = 0f;
     private Vector3 lastNudgeTarget;
@@ -91,6 +96,7 @@ public class Herndon : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         currentState = EnemyState.Roaming;
+        lastState = currentState; // Initialize lastState
         ss = Camera.main.GetComponent<Screen_Shake>();
         SetNewRoamDestination();
 
@@ -111,14 +117,34 @@ public class Herndon : MonoBehaviour
 
     void Update()
     {
-        nudgeCooldownTimer = Mathf.Max(nudgeCooldownTimer - Time.deltaTime, 0f);
+        // When the state changes, reset roamTimer unless we're entering the Searching state (where we want to preserve the advanced timer)
+        if (currentState != lastState)
+        {
+            if (currentState != EnemyState.Searching)
+            {
+                roamTimer = 0;
+            }
+            lastState = currentState;
+        }
 
-        roamTimer += Time.deltaTime;
-        if (roamTimer >= roamInterval && !isEnraged)
+        // Only increment roamTimer if in Roaming state.
+        if (currentState == EnemyState.Roaming)
+        {
+            roamTimer += Time.deltaTime;
+            if (roamTimer >= roamInterval && !isEnraged)
+            {
+                roamTimer = 0f;
+                SetNewRoamDestination();
+            }
+        }
+
+        // Only reset roamTimer if we are actually roaming.
+        if (currentState == EnemyState.Roaming && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             roamTimer = 0f;
-            SetNewRoamDestination();
         }
+
+        nudgeCooldownTimer = Mathf.Max(nudgeCooldownTimer - Time.deltaTime, 0f);
 
         switch (currentState)
         {
@@ -143,6 +169,7 @@ public class Herndon : MonoBehaviour
         HandleRage();
         ClampSpeed();
     }
+
 
     // ======================================================
     // =================== UTILITY METHODS ==================
@@ -256,16 +283,23 @@ public class Herndon : MonoBehaviour
     {
         if (nudgeCooldownTimer > 0f)
             return;
+
         roamTarget = GetRandomNavMeshLocation();
         agent.SetDestination(roamTarget);
+
         if (Vector3.Distance(transform.position, roamTarget) > 2f)
         {
             visitedLocations.Add(roamTarget);
             if (visitedLocations.Count > 10)
                 visitedLocations.RemoveAt(0);
         }
+
         nudgeCooldownTimer = 1f;
+
+        // Increase roamInterval while in this mode
+        roamTimer = Mathf.Min(roamTimer + Time.deltaTime, roamInterval);
     }
+
 
     void ChasePlayer()
     {
@@ -297,16 +331,29 @@ public class Herndon : MonoBehaviour
         }
     }
 
+    // Modified Investigate method:
+    // Once the AI reaches the investigate target (and does not see the player), it immediately transitions to roaming by setting a new roam destination.
     void Investigate()
     {
         agent.speed = walkSpeed;
         if (hasInvestigateTarget)
         {
             agent.SetDestination(investigateTarget);
-            if (Vector3.Distance(transform.position, investigateTarget) < 2f)
+            // Check if the destination is reached
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
                 hasInvestigateTarget = false;
-                currentState = EnemyState.Roaming;
+                // If the player is not visible, switch to roaming and immediately set a new roam destination.
+                if (!CanSeePlayer())
+                {
+                    currentState = EnemyState.Roaming;
+                    SetNewRoamDestination();
+                }
+                else
+                {
+                    // If the player is visible, switch to chasing.
+                    currentState = EnemyState.Chasing;
+                }
             }
         }
     }
@@ -348,6 +395,9 @@ public class Herndon : MonoBehaviour
         }
     }
 
+
+
+
     void SetNewSearchDestination()
     {
         Vector3 fallbackDestination = GetFallbackDestination(lastSeenPlayerPos);
@@ -358,16 +408,27 @@ public class Herndon : MonoBehaviour
     {
         if (player == null)
             return;
-        if (!agent.pathPending && agent.remainingDistance <= 2f)
+
+        // Use a threshold based on the agent's stopping distance plus a small buffer.
+        float threshold = agent.stoppingDistance + 0.5f;
+        if (!agent.pathPending && agent.remainingDistance <= threshold)
         {
-            SetNewSearchDestination();
-        }
-        else
-        {
-            currentState = EnemyState.Roaming;
-            isSearching = false;
+            if (!CanSeePlayer())
+            {
+                // If the enemy has reached the search destination and cannot see the player, switch to Roaming.
+                currentState = EnemyState.Roaming;
+                isSearching = false;
+                SetNewRoamDestination(); // Optionally, choose a new roam destination immediately.
+            }
+            else
+            {
+                // If the enemy sees the player, switch to Chasing.
+                currentState = EnemyState.Chasing;
+            }
         }
     }
+
+
 
     // ======================================================
     // ===================== RAGE SYSTEM ====================
@@ -396,7 +457,7 @@ public class Herndon : MonoBehaviour
                 // Trigger the screen shake.
                 if (ss != null)
                 {
-                    ss.shake = true; 
+                    ss.shake = true;
                     ss.Shake();
                 }
                 currentRage = maxRage;
@@ -432,7 +493,6 @@ public class Herndon : MonoBehaviour
             currentState = CanSeePlayer() ? EnemyState.Chasing : EnemyState.Roaming;
         }
     }
-
 
     void EnragedBehavior()
     {
@@ -481,7 +541,6 @@ public class Herndon : MonoBehaviour
     /// Nudges the enemy toward a target point that is closer to the player.
     /// The target is chosen from within a circle around the player (of radius nudgeRadius).
     /// If a valid target is not found after a few attempts, the enemy moves directly to the player.
-    /// </summary>
     void NudgeTowardsPlayer()
     {
         if (player == null)
@@ -528,4 +587,14 @@ public class Herndon : MonoBehaviour
             agent.SetDestination(player.position);
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            SceneManager.LoadScene(0);
+        }
+    }
+}
+
 }
