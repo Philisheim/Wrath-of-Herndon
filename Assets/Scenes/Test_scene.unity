@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1333,38 +1333,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 622566500}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &986746665 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 416036708093182289, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
-  m_PrefabInstance: {fileID: 5419778789386858758}
-  m_PrefabAsset: {fileID: 0}
---- !u!54 &986746672
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 986746665}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 80
-  m_CollisionDetection: 0
 --- !u!1 &1017865002 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8729448746387299804, guid: 2971bb564509a6c43a4e8114fc719c64, type: 3}
@@ -2856,7 +2824,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!1 &1931812421
 GameObject:
@@ -3253,17 +3221,77 @@ PrefabInstance:
       propertyPath: m_Name
       value: Herndon (Placeholder)(duh)
       objectReference: {fileID: 0}
-    - target: {fileID: 3663722278740233024, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
-      propertyPath: m_Radius
-      value: 0.75
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.size
+      value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 3663722278740233024, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
-      propertyPath: m_IsTrigger
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[1].time
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[2].time
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[0].value
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6637767033399819523, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
-      propertyPath: nudgeCooldownTimer
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[1].value
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[0].inSlope
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[1].inSlope
+      value: 0.14552382
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[2].inSlope
+      value: -0.14285715
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[0].outSlope
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[1].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[1].outSlope
+      value: 0.14552382
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[2].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[2].outSlope
+      value: -0.14285715
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[0].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[1].outWeight
+      value: 0.21881887
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[0].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[1].tangentMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699170491704873971, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
+      propertyPath: curve.m_Curve.Array.data[2].tangentMode
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 8917360355586493440, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3308,10 +3336,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 416036708093182289, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 986746672}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
 --- !u!1001 &8122716253526890300
 PrefabInstance:

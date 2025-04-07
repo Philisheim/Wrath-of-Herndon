@@ -45,10 +45,9 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (stamina == maxStamina)
+        if (Fill.value > FillEffect.value)
         {
-            FillEffect.value = 100;
-            Fill.value = 100;
+            FillEffect.value = Fill.value;
         }
         else
         {
