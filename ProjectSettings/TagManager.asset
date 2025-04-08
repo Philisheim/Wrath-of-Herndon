@@ -3,16 +3,24 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+<<<<<<< HEAD
+  - Obstacle
+=======
+  - Herndon
+  - Ground
+  - Heard
+  - Noisy
+>>>>>>> Player_movement_testing
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Obsticle
   - Water
   - UI
-  - 
-  - 
+  - Player
+  - Misc
   - 
   - 
   - 

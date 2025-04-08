@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Wrath-of-Herndon.sln"
+    "dotnet.defaultSolution": "Wrath of Herndon.sln"
 }
