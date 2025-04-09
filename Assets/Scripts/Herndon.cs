@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 namespace WrathOfHerndon
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    [RequireComponent(typeof(Screen_Shake))]
     [RequireComponent(typeof(SphereCollider))]
     public class Herndon : MonoBehaviour
     {
@@ -54,6 +53,9 @@ namespace WrathOfHerndon
         private float rageCooldownTimer = 0f;
         private bool inRageCooldown = false;
         private float outOfSightTimer = 0f;
+        [Tooltip("Percentage of max rage before rage buffs are lost.")]
+        public float rageThreshold = 0.55f;
+
         [Header("Rage Decrease Settings")]
         [Tooltip("Time before rage starts decreasing when out of sight.")]
         public float maxOutOfSight = 4f; // Delay in seconds before rage decreases
@@ -61,8 +63,7 @@ namespace WrathOfHerndon
         public float rageDecreaseMultiplierIncrease = 0.5f;
         // Mimics the stamina regen multiplier logic.
         private float currentRageDecreaseMultiplier = 1f;
-        [Tooltip("Percentage of max rage before rage buffs are lost.")]
-        public float rageThreshold = 0.45f; // Default 45%
+
 
         // -------- Nudge Settings --------
         [Header("Nudge Settings")]
@@ -103,7 +104,8 @@ namespace WrathOfHerndon
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
-            ss = GetComponent<Screen_Shake>();
+            ss = Camera.main.GetComponent<Screen_Shake>();
+
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
             currentState = EnemyState.Roaming;
             lastState = currentState; // Initialize lastState
@@ -629,7 +631,7 @@ namespace WrathOfHerndon
         {
             if (collision.gameObject.CompareTag("Player"))
             {
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(1);
             }
         }
 

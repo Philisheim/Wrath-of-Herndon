@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 6637767033399819523}
   - component: {fileID: 4355988920425327901}
   - component: {fileID: 203330273258584004}
-  - component: {fileID: 7699170491704873971}
   - component: {fileID: 7488337978275784212}
   m_Layer: 0
   m_Name: Herndon (Placeholder)(duh)
@@ -128,16 +127,17 @@ MonoBehaviour:
   runSpeed: 6
   sightRange: 30
   hearingRange: 45
+  hearingRadius: 5
   rageSightIncrease: 10
   rageHearingIncrease: 25
   rageWalkIncrease: 2.5
   rageRunIncrease: 10
   playerLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 256
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 72
   maxRage: 100
   rageIncreaseRate: 5
   rageDecreaseRate: 1
@@ -198,26 +198,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &7699170491704873971
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 416036708093182289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6658d70b8287bd64cb75006d48fad316, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shake: 0
-  curve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  duration: 1.5
 --- !u!135 &7488337978275784212
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -105,7 +105,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Herndon"))
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(1);
         }
     }
 
