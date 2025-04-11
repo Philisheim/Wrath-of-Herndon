@@ -20,6 +20,10 @@ namespace WrathOfHerndon
         private NavMeshAgent agent;
         private Transform player;
         private Screen_Shake ss;
+        private Animator animator; // Animator component reference
+
+        // To track which animation is currently playing
+        private string currentAnimState = "";
 
         // -------- Movement Settings --------
         [Header("Movement Speeds")]
@@ -31,23 +35,24 @@ namespace WrathOfHerndon
         public float sightRange = 15f;
         public float hearingRange = 25f;
         public float hearingRadius = 5f; // Radius for investigating a noise
+
         // Rage-modified values (base + increase)
         private float rageSight;
         private float rageHearing;
         private float rageWalk;
         private float rageRun;
-        public float rageSightIncrease;   // Extra sightRange when enraged
-        public float rageHearingIncrease; // Extra hearing range while enraged
-        public float rageWalkIncrease;    // Extra walk speed while enraged
-        public float rageRunIncrease;     // Extra run speed while enraged
+        public float rageSightIncrease;
+        public float rageHearingIncrease;
+        public float rageWalkIncrease;
+        public float rageRunIncrease;
         public LayerMask playerLayer;
         public LayerMask obstacleLayer;
 
         // -------- Rage Settings --------
         [Header("Rage Buff Settings")]
         public float maxRage = 100f;
-        public float rageIncreaseRate = 10f; // Per second when player is visible
-        public float rageDecreaseRate = 5f;  // Per second when player is not visible
+        public float rageIncreaseRate = 10f;
+        public float rageDecreaseRate = 5f;
         public float currentRage = 0f;
         private bool isEnraged = false;
         private float rageCooldownTimer = 0f;
@@ -58,12 +63,10 @@ namespace WrathOfHerndon
 
         [Header("Rage Decrease Settings")]
         [Tooltip("Time before rage starts decreasing when out of sight.")]
-        public float maxOutOfSight = 4f; // Delay in seconds before rage decreases
+        public float maxOutOfSight = 4f;
         [Tooltip("How fast the rage decrease multiplier increases per second.")]
         public float rageDecreaseMultiplierIncrease = 0.5f;
-        // Mimics the stamina regen multiplier logic.
         private float currentRageDecreaseMultiplier = 1f;
-
 
         // -------- Nudge Settings --------
         [Header("Nudge Settings")]
@@ -105,13 +108,14 @@ namespace WrathOfHerndon
         {
             agent = GetComponent<NavMeshAgent>();
             ss = Camera.main.GetComponent<Screen_Shake>();
+            animator = GetComponent<Animator>(); // Get the Animator component
 
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
             currentState = EnemyState.Roaming;
             lastState = currentState; // Initialize lastState
             SetNewRoamDestination();
 
-            // Cache original movement and detection values.
+            // Cache original values
             originalWalkSpeed = walkSpeed;
             originalRunSpeed = runSpeed;
             originalSightRange = sightRange;
@@ -133,7 +137,7 @@ namespace WrathOfHerndon
 
         void Update()
         {
-            // When the state changes, reset roamTimer unless we're entering the Searching state (where we want to preserve the advanced timer)
+            // When the state changes, reset roamTimer (unless in Searching state)
             if (currentState != lastState)
             {
                 if (currentState != EnemyState.Searching)
@@ -143,7 +147,7 @@ namespace WrathOfHerndon
                 lastState = currentState;
             }
 
-            // Only increment roamTimer if in Roaming state.
+            // Increment roamTimer if roaming
             if (currentState == EnemyState.Roaming)
             {
                 roamTimer += Time.deltaTime;
@@ -154,7 +158,6 @@ namespace WrathOfHerndon
                 }
             }
 
-            // Only reset roamTimer if we are actually roaming.
             if (currentState == EnemyState.Roaming && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
                 roamTimer = 0f;
@@ -162,6 +165,7 @@ namespace WrathOfHerndon
 
             nudgeCooldownTimer = Mathf.Max(nudgeCooldownTimer - Time.deltaTime, 0f);
 
+            // State-based logic
             switch (currentState)
             {
                 case EnemyState.Roaming:
@@ -184,6 +188,9 @@ namespace WrathOfHerndon
             CheckForPlayer();
             HandleRage();
             ClampSpeed();
+
+            // Update the animator based on the current state and movement.
+            UpdateAnimationState();
         }
 
         // ======================================================
@@ -191,8 +198,6 @@ namespace WrathOfHerndon
         // ======================================================
         void ClampSpeed()
         {
-            // When enraged and above threshold, use buffed speeds.
-            // Otherwise, revert to original speeds.
             if (isEnraged && currentRage >= rageThreshold * maxRage)
             {
                 if (currentState == EnemyState.Roaming || currentState == EnemyState.Searching || currentState == EnemyState.Investigating)
@@ -310,8 +315,6 @@ namespace WrathOfHerndon
             }
 
             nudgeCooldownTimer = 1f;
-
-            // Increase roamInterval while in this mode
             roamTimer = Mathf.Min(roamTimer + Time.deltaTime, roamInterval);
         }
 
@@ -335,46 +338,32 @@ namespace WrathOfHerndon
                 StartSearching();
         }
 
-        /// <summary>
-        /// Processes a noise event.
-        /// If the player is not visible, picks a random investigation target within hearingRadius around the noise,
-        /// and changes the AI state to Investigating.
-        /// </summary>
-        /// <param name="noisePosition">The position where the noise originated.</param>
-        /// <param name="noiseSource">The GameObject that made the noise (optional).</param>
         public void HearNoise(Vector3 noisePosition, GameObject noiseSource = null)
         {
-            // Do not override behavior if the player is visible.
             if (CanSeePlayer())
                 return;
 
-            // Pick a random target within hearingRadius from the noise position.
             Vector3 randomOffset = Random.insideUnitSphere * hearingRadius;
             randomOffset.y = 0;
             investigateTarget = noisePosition + randomOffset;
             hasInvestigateTarget = true;
             currentState = EnemyState.Investigating;
 
-            // Optionally, tag the noise source as "Heard" so it won't trigger again.
             if (noiseSource != null)
             {
                 noiseSource.tag = "Heard";
             }
         }
 
-        // Modified Investigate method:
-        // Once the AI reaches the investigate target (and does not see the player), it immediately transitions to roaming by setting a new roam destination.
         void Investigate()
         {
             agent.speed = walkSpeed;
             if (hasInvestigateTarget)
             {
                 agent.SetDestination(investigateTarget);
-                // Check if the destination is reached
                 if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
                 {
                     hasInvestigateTarget = false;
-                    // If the player is not visible, switch to roaming and immediately set a new roam destination.
                     if (!CanSeePlayer())
                     {
                         currentState = EnemyState.Roaming;
@@ -382,17 +371,14 @@ namespace WrathOfHerndon
                     }
                     else
                     {
-                        // If the player is visible, switch to chasing.
                         currentState = EnemyState.Chasing;
                     }
                 }
             }
         }
 
-        // Gets a valid destination within the searchRadius of the last seen position.
         Vector3 GetFallbackDestination(Vector3 lastKnownPos)
         {
-            // Calculate the direction from the enemy to the last known player position.
             Vector3 dirToLastSeen = (lastKnownPos - transform.position).normalized;
             int maxAttempts = 10;
             for (int i = 0; i < maxAttempts; i++)
@@ -400,8 +386,6 @@ namespace WrathOfHerndon
                 Vector3 randomOffset = Random.insideUnitSphere * searchRadius;
                 randomOffset.y = 0;
                 Vector3 potentialTarget = lastKnownPos + randomOffset;
-
-                // Check if the potential target is generally toward the player.
                 Vector3 dirToPotential = (potentialTarget - transform.position).normalized;
                 if (Vector3.Dot(dirToPotential, dirToLastSeen) > 0.5f)
                 {
@@ -412,8 +396,6 @@ namespace WrathOfHerndon
                     }
                 }
             }
-
-            // Fallback: choose a point directly in the direction of the last seen position.
             Vector3 fallbackTarget = transform.position + dirToLastSeen * searchRadius;
             NavMeshHit fallbackHit;
             if (NavMesh.SamplePosition(fallbackTarget, out fallbackHit, 5f, NavMesh.AllAreas))
@@ -444,20 +426,17 @@ namespace WrathOfHerndon
             if (player == null)
                 return;
 
-            // Use a threshold based on the agent's stopping distance plus a small buffer.
             float threshold = agent.stoppingDistance + 0.5f;
             if (!agent.pathPending && agent.remainingDistance <= threshold)
             {
                 if (!CanSeePlayer())
                 {
-                    // If the enemy has reached the search destination and cannot see the player, switch to Roaming.
                     currentState = EnemyState.Roaming;
                     isSearching = false;
-                    SetNewRoamDestination(); // Optionally, choose a new roam destination immediately.
+                    SetNewRoamDestination();
                 }
                 else
                 {
-                    // If the enemy sees the player, switch to Chasing.
                     currentState = EnemyState.Chasing;
                 }
             }
@@ -470,7 +449,6 @@ namespace WrathOfHerndon
         {
             if (CanSeePlayer())
             {
-                // Reset the timer and multiplier when the player is visible.
                 outOfSightTimer = 0f;
                 currentRageDecreaseMultiplier = 1f;
                 currentRage += Time.deltaTime * rageIncreaseRate;
@@ -480,7 +458,6 @@ namespace WrathOfHerndon
                 outOfSightTimer += Time.deltaTime;
                 if (outOfSightTimer >= maxOutOfSight)
                 {
-                    // Increase the multiplier over time like stamina regen.
                     currentRageDecreaseMultiplier += rageDecreaseMultiplierIncrease * Time.deltaTime;
                     currentRage -= Time.deltaTime * rageDecreaseRate * currentRageDecreaseMultiplier;
                 }
@@ -489,7 +466,6 @@ namespace WrathOfHerndon
 
             if (!inRageCooldown)
             {
-                // Enter enraged state when rage reaches maximum.
                 if (!isEnraged && currentRage >= maxRage)
                 {
                     if (ss != null)
@@ -501,7 +477,6 @@ namespace WrathOfHerndon
                     isEnraged = true;
                     currentState = EnemyState.Enraged;
                 }
-                // Exit enraged state once rage falls below the threshold.
                 else if (isEnraged && currentRage < rageThreshold * maxRage)
                 {
                     isEnraged = false;
@@ -533,7 +508,6 @@ namespace WrathOfHerndon
 
         void EnragedBehavior()
         {
-            // If the enemy's rage is above the threshold, maintain buffed speeds.
             if (currentRage >= rageThreshold * maxRage)
             {
                 runSpeed = rageRun;
@@ -545,23 +519,20 @@ namespace WrathOfHerndon
                 {
                     if (CanSeePlayer())
                     {
-                        // Chase the player if visible.
                         agent.SetDestination(player.position);
                     }
                     else
                     {
-                        // Every 2 seconds, nudge the enemy if the cooldown has elapsed.
                         if (nudgeCooldownTimer <= 0f)
                         {
                             NudgeTowardsPlayer();
-                            nudgeCooldownTimer = 2f; // Reset the nudge timer to 2 seconds.
+                            nudgeCooldownTimer = 2f;
                         }
                     }
                 }
             }
             else
             {
-                // Rage has fallen below the threshold, so remove buffs.
                 NormalBehavior();
                 currentState = CanSeePlayer() ? EnemyState.Chasing : EnemyState.Roaming;
             }
@@ -575,30 +546,20 @@ namespace WrathOfHerndon
             hearingRange = originalHearingRange;
         }
 
-        /// <summary>
-        /// Nudges the enemy toward a target point that is closer to the player.
-        /// The target is chosen from within a circle around the player (of radius nudgeRadius).
-        /// If a valid target is not found after a few attempts, the enemy moves directly to the player.
-        /// </summary>
         void NudgeTowardsPlayer()
         {
             if (player == null)
                 return;
 
-            // Calculate current distance from enemy to player.
             float currentDistance = Vector3.Distance(transform.position, player.position);
-
-            // We want a target that's closer than currentDistance.
             Vector3 targetPosition = player.position; // Fallback
             bool foundValidTarget = false;
             int maxAttempts = 10;
             for (int i = 0; i < maxAttempts; i++)
             {
-                // Pick a random point inside a circle of radius nudgeRadius (on XZ plane)
                 Vector2 randomPoint = Random.insideUnitCircle * nudgeRadius;
                 Vector3 potentialTarget = player.position + new Vector3(randomPoint.x, 0, randomPoint.y);
 
-                // Ensure this point is closer to the player than the enemy's current position.
                 if (Vector3.Distance(player.position, potentialTarget) < currentDistance)
                 {
                     targetPosition = potentialTarget;
@@ -607,13 +568,11 @@ namespace WrathOfHerndon
                 }
             }
 
-            // If no valid target was found, default to the player's position.
             if (!foundValidTarget)
             {
                 targetPosition = player.position;
             }
 
-            // Validate the chosen target using NavMesh sampling.
             NavMeshHit hit;
             if (NavMesh.SamplePosition(targetPosition, out hit, 5f, NavMesh.AllAreas))
             {
@@ -622,7 +581,6 @@ namespace WrathOfHerndon
             }
             else
             {
-                // If sampling fails, set destination directly to the player.
                 agent.SetDestination(player.position);
             }
         }
@@ -638,15 +596,49 @@ namespace WrathOfHerndon
         // ======================================================
         // =================== HEARING SYSTEM ===================
         // ======================================================
-        // This method uses the SphereCollider (set as a trigger) to detect objects with the "Noisy" tag.
-        // When a noise is detected, if the player is not visible, the enemy will set an investigation target within hearingRadius.
-        // The noise source is then tagged as "Heard" so it doesn't repeatedly trigger.
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Noisy"))
             {
-                // Call HearNoise and pass the noise source, so it can be re-tagged.
                 HearNoise(other.transform.position, other.gameObject);
+            }
+        }
+
+        // ======================================================
+        // ============== ANIMATION MANAGEMENT ==================
+        // ======================================================
+        // This method updates the animations based on the enemy’s current state and behavior.
+        // It directly plays the named animation states ("Idle", "Walk", "Run") defined in your Animator Controller.
+        void UpdateAnimationState()
+        {
+            string newAnimState = "";
+
+            // Use state and movement to decide which animation to play.
+            switch (currentState)
+            {
+                // For states where the enemy is not actively chasing
+                case EnemyState.Roaming:
+                case EnemyState.Investigating:
+                case EnemyState.Searching:
+                    // If the enemy is nearly stationary then Idle, otherwise Walk.
+                    if (agent.velocity.magnitude < 0.1f)
+                        newAnimState = "Idle";
+                    else
+                        newAnimState = "Walk";
+                    break;
+
+                // For aggressive states
+                case EnemyState.Chasing:
+                case EnemyState.Enraged:
+                    newAnimState = "Run";
+                    break;
+            }
+
+            // Only change the animation if it differs from the current one.
+            if (newAnimState != currentAnimState)
+            {
+                animator.Play(newAnimState);
+                currentAnimState = newAnimState;
             }
         }
     }

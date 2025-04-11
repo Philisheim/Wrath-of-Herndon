@@ -26177,6 +26177,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2978861661846278773, guid: e983390295a82b64ca66d604e95bebe6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 696104129}
+    - targetCorrespondingSourceObject: {fileID: 2978861661846278773, guid: e983390295a82b64ca66d604e95bebe6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 696104133}
   m_SourcePrefab: {fileID: 100100000, guid: e983390295a82b64ca66d604e95bebe6, type: 3}
 --- !u!1 &696104128 stripped
 GameObject:
@@ -26291,6 +26294,27 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!95 &696104133
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 696104128}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b92360e64c7eff54e84341e7afa9bcb3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &697212872
 PrefabInstance:
   m_ObjectHideFlags: 0
