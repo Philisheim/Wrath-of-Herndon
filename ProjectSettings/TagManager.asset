@@ -8,6 +8,7 @@ TagManager:
   - Obstacle
   - Ground
   - Noisy
+  - Heard
   layers:
   - Default
   - TransparentFX
