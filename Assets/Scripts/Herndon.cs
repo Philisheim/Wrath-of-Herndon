@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 namespace WrathOfHerndon
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    [RequireComponent(typeof(SphereCollider))]
     public class Herndon : MonoBehaviour
     {
         // ======================================================
@@ -635,10 +634,13 @@ namespace WrathOfHerndon
             }
 
             // Only change the animation if it differs from the current one.
-            if (newAnimState != currentAnimState)
+            if (animator != null)
             {
-                animator.Play(newAnimState);
-                currentAnimState = newAnimState;
+                if (newAnimState != currentAnimState)
+                {
+                    animator.Play(newAnimState);
+                    currentAnimState = newAnimState;
+                }
             }
         }
     }

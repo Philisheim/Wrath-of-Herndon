@@ -242,7 +242,7 @@ GameObject:
   - component: {fileID: 31201421}
   m_Layer: 3
   m_Name: Cube (16)
-  m_TagString: Obstacle
+  m_TagString: Noisy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1620,7 +1620,7 @@ GameObject:
   - component: {fileID: 1317375226}
   m_Layer: 3
   m_Name: Cube (12)
-  m_TagString: Obstacle
+  m_TagString: Noisy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3299,7 +3299,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8917360355586493440, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.42
+      value: 17.875
       objectReference: {fileID: 0}
     - target: {fileID: 8917360355586493440, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3307,7 +3307,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8917360355586493440, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 19.83
+      value: -51.875
       objectReference: {fileID: 0}
     - target: {fileID: 8917360355586493440, guid: 3631bc4da42a12547b7bb317fc4a8269, type: 3}
       propertyPath: m_LocalRotation.w
