@@ -18,6 +18,7 @@ namespace WrathOfHerndon
         }
         public void PlayGame()
         {
+            
             SceneManager.LoadScene(1);
         }
 
