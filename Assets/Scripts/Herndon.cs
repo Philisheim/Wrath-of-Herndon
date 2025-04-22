@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -23,6 +23,16 @@ namespace WrathOfHerndon
 
         // To track which animation is currently playing
         private string currentAnimState = "";
+
+        [Header("Footstep SFX")]
+        public AudioSource footstepSource;       // assign in Inspector
+        public AudioClip[] footstepClips;        // drag‑in your clips here
+        public float baseStepInterval = 0.5f;    // seconds between steps at walkSpeed
+        [Range(0.8f, 1.2f)]
+        public Vector2 pitchRange = new Vector2(0.9f, 1.1f);
+
+        private float stepTimer = 0f;
+
 
         // -------- Movement Settings --------
         [Header("Movement Speeds")]
@@ -140,57 +150,49 @@ namespace WrathOfHerndon
             if (currentState != lastState)
             {
                 if (currentState != EnemyState.Searching)
-                {
-                    roamTimer = 0;
-                }
+                    roamTimer = 0f;
                 lastState = currentState;
             }
 
-            // Increment roamTimer if roaming
-            if (currentState == EnemyState.Roaming)
+            // If we've reached our roamTarget, pick a new one
+            if (currentState == EnemyState.Roaming && !isEnraged
+                && !agent.pathPending
+                && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                SetNewRoamDestination();
+            }
+
+            // Fallback: if we've been roaming too long, pick a new one
+            if (currentState == EnemyState.Roaming && !isEnraged)
             {
                 roamTimer += Time.deltaTime;
-                if (roamTimer >= roamInterval && !isEnraged)
-                {
-                    roamTimer = 0f;
+                if (roamTimer >= roamInterval)
                     SetNewRoamDestination();
-                }
             }
 
-            if (currentState == EnemyState.Roaming && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
-            {
-                roamTimer = 0f;
-            }
-
+            // Cool down for nudges
             nudgeCooldownTimer = Mathf.Max(nudgeCooldownTimer - Time.deltaTime, 0f);
 
-            // State-based logic
+            // State‐based behavior
             switch (currentState)
             {
-                case EnemyState.Roaming:
-                    Roam();
-                    break;
-                case EnemyState.Chasing:
-                    ChasePlayer();
-                    break;
-                case EnemyState.Investigating:
-                    Investigate();
-                    break;
-                case EnemyState.Searching:
-                    SearchArea();
-                    break;
-                case EnemyState.Enraged:
-                    EnragedBehavior();
-                    break;
+                case EnemyState.Roaming: Roam(); break;
+                case EnemyState.Chasing: ChasePlayer(); break;
+                case EnemyState.Investigating: Investigate(); break;
+                case EnemyState.Searching: SearchArea(); break;
+                case EnemyState.Enraged: EnragedBehavior(); break;
             }
 
+            // Always run detection, rage, speed clamps, and animations
             CheckForPlayer();
             HandleRage();
             ClampSpeed();
-
-            // Update the animator based on the current state and movement.
             UpdateAnimationState();
+            HandleFootsteps();
         }
+
+
+
 
         // ======================================================
         // =================== UTILITY METHODS ==================
@@ -300,12 +302,18 @@ namespace WrathOfHerndon
 
         void SetNewRoamDestination()
         {
+            // Reset the timer whenever we pick a new roam point
+            roamTimer = 0f;
+
+            // If nudge cooldown is active, bail out
             if (nudgeCooldownTimer > 0f)
                 return;
 
+            // Choose and go
             roamTarget = GetRandomNavMeshLocation();
             agent.SetDestination(roamTarget);
 
+            // Track visited
             if (Vector3.Distance(transform.position, roamTarget) > 2f)
             {
                 visitedLocations.Add(roamTarget);
@@ -313,9 +321,10 @@ namespace WrathOfHerndon
                     visitedLocations.RemoveAt(0);
             }
 
+            // Restart nudge cooldown
             nudgeCooldownTimer = 1f;
-            roamTimer = Mathf.Min(roamTimer + Time.deltaTime, roamInterval);
         }
+
 
         void ChasePlayer()
         {
@@ -603,10 +612,53 @@ namespace WrathOfHerndon
             }
         }
 
+        void HandleFootsteps()
+        {
+            // get how fast we're actually moving (on the NavMesh)
+            float speed = agent.velocity.magnitude;
+
+            // only play when moving faster than a tiny threshold
+            if (speed > 0.1f && currentState == EnemyState.Roaming || currentState == EnemyState.Chasing || currentState == EnemyState.Enraged)
+            {
+                // interval shrinks as speed increases:
+                //   at walkSpeed  => baseStepInterval
+                //   at runSpeed   => baseStepInterval * (walkSpeed / runSpeed)
+                float interval = baseStepInterval * (walkSpeed / speed);
+
+                stepTimer += Time.deltaTime;
+                if (stepTimer >= interval)
+                {
+                    PlayFootstep(speed);
+                    stepTimer = 0f;
+                }
+            }
+            else
+            {
+                // reset so we don't buffer up a long timer while standing still
+                stepTimer = 0f;
+            }
+        }
+
+        void PlayFootstep(float currentSpeed)
+        {
+            if (footstepClips.Length == 0 || footstepSource == null) return;
+
+            // choose a random clip
+            var clip = footstepClips[Random.Range(0, footstepClips.Length)];
+
+            // scale the pitch by how fast we are, clamped to pitchRange
+            float speedRatio = Mathf.InverseLerp(walkSpeed, runSpeed, currentSpeed);
+            float pitch = Mathf.Lerp(pitchRange.x, pitchRange.y, speedRatio);
+            footstepSource.pitch = pitch;
+
+            footstepSource.PlayOneShot(clip);
+        }
+
+
         // ======================================================
         // ============== ANIMATION MANAGEMENT ==================
         // ======================================================
-        // This method updates the animations based on the enemy�s current state and behavior.
+        // This method updates the animations based on the enemy’s current state and behavior.
         // It directly plays the named animation states ("Idle", "Walk", "Run") defined in your Animator Controller.
         void UpdateAnimationState()
         {
