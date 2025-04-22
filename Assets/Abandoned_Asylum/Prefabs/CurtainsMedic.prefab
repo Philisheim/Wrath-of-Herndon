@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33150027955699594}
   - component: {fileID: 23396947071108364}
   - component: {fileID: 64009747159718830}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CurtainsMedic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484267309322176}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00000003774895, y: 0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.539723, y: 3.864496e-16, z: -17.404142}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0

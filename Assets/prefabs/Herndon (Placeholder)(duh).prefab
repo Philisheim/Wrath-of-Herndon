@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4355988920425327901}
   - component: {fileID: 203330273258584004}
   - component: {fileID: 7488337978275784212}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Herndon (Placeholder)(duh)
   m_TagString: Herndon
   m_Icon: {fileID: 0}
@@ -134,17 +134,17 @@ MonoBehaviour:
   rageRunIncrease: 10
   playerLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 257
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 192
   maxRage: 100
   rageIncreaseRate: 5
   rageDecreaseRate: 1
   currentRage: 0
+  rageThreshold: 0.55
   maxOutOfSight: 2
   rageDecreaseMultiplierIncrease: 0.5
-  rageThreshold: 0.55
   nudgeRadius: 45
   roamInterval: 90
   roamTimer: 0
