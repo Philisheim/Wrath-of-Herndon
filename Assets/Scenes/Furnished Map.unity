@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3999,13 +3999,14 @@ GameObject:
   - component: {fileID: 64097724}
   - component: {fileID: 64097726}
   - component: {fileID: 64097725}
+  - component: {fileID: 64097727}
   m_Layer: 5
   m_Name: Notebook paper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &64097724
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4064,6 +4065,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 64097723}
   m_CullTransparentMesh: 1
+--- !u!114 &64097727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64097723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AspectMode: 0
+  m_AspectRatio: 0.75
 --- !u!1001 &64646321
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94265,6 +94280,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 263525739625563523, guid: 2756cf518c829e6499cd3045a58a64e2, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1936712353213758462, guid: 2756cf518c829e6499cd3045a58a64e2, type: 3}
       propertyPath: m_Pivot.x
       value: 0
