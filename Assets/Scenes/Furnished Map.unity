@@ -23543,6 +23543,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 416178, guid: fe546dac68b4ae943a161dec60c98fed, type: 3}
   m_PrefabInstance: {fileID: 413066911}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &413367226 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1801278519735074, guid: 0b7451c289c0d9547a21ba7eb3340776, type: 3}
+  m_PrefabInstance: {fileID: 1972523577}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &414093923
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117369,13 +117374,61 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1801278519735074, guid: 0b7451c289c0d9547a21ba7eb3340776, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1972523582}
+    - targetCorrespondingSourceObject: {fileID: 1801278519735074, guid: 0b7451c289c0d9547a21ba7eb3340776, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1972523581}
   m_SourcePrefab: {fileID: 100100000, guid: 0b7451c289c0d9547a21ba7eb3340776, type: 3}
 --- !u!4 &1972523578 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4413510086684120, guid: 0b7451c289c0d9547a21ba7eb3340776, type: 3}
   m_PrefabInstance: {fileID: 1972523577}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &1972523581
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413367226}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2}
+  m_Center: {x: -3.3839625e-19, y: 0.0005079404, z: -0.00000011920929}
+--- !u!114 &1972523582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413367226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a0d6a0fd8d9e1e499c65301e12b6220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  notebookCanvas: {fileID: 64097723}
+  problemText1: {fileID: 1422640329}
+  problemText2: {fileID: 1760390469}
+  problemText3: {fileID: 1644041534}
+  answerInput1: {fileID: 488029607}
+  answerInput2: {fileID: 491699847}
+  answerInput3: {fileID: 1494431498}
+  submitButton: {fileID: 328340469}
+  interactionPrompt: {fileID: 2034491463}
 --- !u!1001 &1974725795
 PrefabInstance:
   m_ObjectHideFlags: 0
