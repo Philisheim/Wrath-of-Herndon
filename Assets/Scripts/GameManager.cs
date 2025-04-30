@@ -1,23 +1,39 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using TMPro;
 
-public class GameManager : MonoBehaviour
+namespace WrathOfHerndon
 {
-    public static GameManager instance;
-
-    private void Awake()
+    public class GameManager : MonoBehaviour
     {
-        if (instance)
+        public static GameManager Instance { get; private set; }
+
+        [Header("UI")]
+        [SerializeField] private TextMeshProUGUI notebookCountText;
+
+        private int notebooksCollected = 0;
+
+        private void Awake()
         {
-            Destroy(this);
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            UpdateNotebookUI();
         }
-        else
+
+        public void AddNotebook()
         {
-            instance = this;
-            DontDestroyOnLoad(this);
+            notebooksCollected++;
+            UpdateNotebookUI();
+        }
+
+        private void UpdateNotebookUI()
+        {
+            if (notebookCountText != null)
+                notebookCountText.text = $"Notebooks: {notebooksCollected}";
         }
     }
 }

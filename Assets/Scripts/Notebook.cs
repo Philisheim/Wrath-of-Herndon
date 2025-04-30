@@ -53,10 +53,11 @@ namespace WrathOfHerndon
         [SerializeField] private TextMeshProUGUI problemText1;    // Displays problem 1
         [SerializeField] private TextMeshProUGUI problemText2;    // Displays problem 2
         [SerializeField] private TextMeshProUGUI problemText3;    // Displays problem 3
-        [SerializeField] private TMP_InputField answerInput1;    // Input for answer 1
-        [SerializeField] private TMP_InputField answerInput2;    // Input for answer 2
-        [SerializeField] private TMP_InputField answerInput3;    // Input for answer 3
-        [SerializeField] private Button submitButton;            // Submit button
+        [SerializeField] private TMP_InputField answerInput1;     // Input for answer 1
+        [SerializeField] private TMP_InputField answerInput2;     // Input for answer 2
+        [SerializeField] private TMP_InputField answerInput3;     // Input for answer 3
+        [SerializeField] private Button submitButton;             // Submit button
+        [SerializeField] private TextMeshProUGUI interactionPrompt;
 
         //––– Remaining pools to avoid repeats until scene reload –––
         private List<string> remainingAlgebra2;
@@ -100,7 +101,14 @@ namespace WrathOfHerndon
             {"Compute: ∫ ( 3x² dx ) from 0 to 1", "1"}
         };
 
-        private bool isPlayerInRange = false;  // Tracks if player is within interaction range
+        // Tracks if player is within interaction range
+        private bool isPlayerInRange = false;
+
+        // STATIC: which notebook (if any) currently has the UI open
+        private static Notebook activeNotebook = null;
+
+        // Ensures each notebook only draws its problems once
+        private bool problemsInitialized = false;
 
         private void Start()
         {
@@ -120,65 +128,119 @@ namespace WrathOfHerndon
             // Clear any placeholder text/inputs
             ClearProblemTexts();
             ClearInputFields();
+
+            // Hide the prompt initially
+            if (interactionPrompt != null)
+            {
+                interactionPrompt.text = "";
+                interactionPrompt.gameObject.SetActive(false);
+            }
         }
 
         private void Update()
         {
-            // Open/close the notebook when player presses E in range
+            // Only respond to "E" if player is in range
             if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
-                ToggleCanvas();
+            {
+                bool isOpen = notebookCanvas.activeSelf;
+
+                // Open this notebook if none is active
+                if (!isOpen && activeNotebook == null)
+                {
+                    activeNotebook = this;
+                    ToggleCanvas();
+                }
+                // Close only if *this* notebook is active
+                else if (isOpen && activeNotebook == this)
+                {
+                    ToggleCanvas();
+                    activeNotebook = null;
+                }
+            }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            // Only trigger on the player
             if (other.CompareTag("Player"))
             {
                 isPlayerInRange = true;
-                Debug.Log("Press 'E' to open the notebook.");
+
+                // Show prompt only if no notebook is open
+                if (activeNotebook == null && interactionPrompt != null)
+                {
+                    interactionPrompt.text = "Press E to open notebook";
+                    interactionPrompt.gameObject.SetActive(true);
+                }
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Player"))
+            {
                 isPlayerInRange = false;
+
+                // Hide prompt when you walk away
+                if (interactionPrompt != null)
+                {
+                    interactionPrompt.text = "";
+                    interactionPrompt.gameObject.SetActive(false);
+                }
+            }
         }
 
-        // Opens or closes the notebook UI and handles pausing
         private void ToggleCanvas()
         {
             if (notebookCanvas == null) return;
+
             bool open = !notebookCanvas.activeSelf;
             notebookCanvas.SetActive(open);
 
             if (open)
             {
-                Time.timeScale = 0f;  // Freeze gameplay
+                // Pause game & show mouse
+                Time.timeScale = 0f;
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
 
-                // Draw and display three unique problems
-                currentProblem1 = DrawUniqueProblem();
-                currentProblem2 = DrawUniqueProblem();
-                currentProblem3 = DrawUniqueProblem();
+                // Hide the interaction prompt
+                if (interactionPrompt != null)
+                    interactionPrompt.gameObject.SetActive(false);
+
+                // Only draw once, per-notebook
+                if (!problemsInitialized)
+                {
+                    currentProblem1 = DrawUniqueProblem();
+                    currentProblem2 = DrawUniqueProblem();
+                    currentProblem3 = DrawUniqueProblem();
+                    problemsInitialized = true;
+                }
+
+                // Display them
                 problemText1.text = currentProblem1;
                 problemText2.text = currentProblem2;
                 problemText3.text = currentProblem3;
-
                 ClearInputFields();
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
             }
             else
             {
-                Time.timeScale = 1f;  // Resume gameplay
-                ClearProblemTexts();
-                ClearInputFields();
+                // Resume game & lock mouse
+                Time.timeScale = 1f;
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
+
+                ClearProblemTexts();
+                ClearInputFields();
+
+                // If still in range, show the prompt again
+                if (isPlayerInRange && interactionPrompt != null)
+                {
+                    interactionPrompt.text = "Press E to open notebook";
+                    interactionPrompt.gameObject.SetActive(true);
+                }
             }
         }
 
-        // Ensures no problem repeats until reload by removing drawn problem from its pool
         private string DrawUniqueProblem()
         {
             List<string> pool = MainMenu.difficulty switch
@@ -197,26 +259,33 @@ namespace WrathOfHerndon
 
             int idx = UnityEngine.Random.Range(0, pool.Count);
             string problem = pool[idx];
-            pool.RemoveAt(idx);  // Prevent reuse
+            pool.RemoveAt(idx);
             return problem;
         }
 
-        // Called when the player submits their answers
         private void SubmitAnswers()
         {
+            // Only the active notebook should respond
+            if (activeNotebook != this) return;
+
             CheckAnswer(answerInput1, currentProblem1);
             CheckAnswer(answerInput2, currentProblem2);
             CheckAnswer(answerInput3, currentProblem3);
 
-            // If all are correct, close and resume
-            bool allCorrect = IsAnswerCorrect(answerInput1.text.Trim(), currentProblem1)
-                              && IsAnswerCorrect(answerInput2.text.Trim(), currentProblem2)
-                              && IsAnswerCorrect(answerInput3.text.Trim(), currentProblem3);
-            if (allCorrect)
-                ToggleCanvas();
+            bool allCorrect =
+                IsAnswerCorrect(answerInput1.text.Trim(), currentProblem1) &&
+                IsAnswerCorrect(answerInput2.text.Trim(), currentProblem2) &&
+                IsAnswerCorrect(answerInput3.text.Trim(), currentProblem3);
+
+            if (!allCorrect)
+                return;
+
+            // close, collect, and destroy
+            ToggleCanvas();
+            GameManager.Instance.AddNotebook();
+            Destroy(gameObject);
         }
 
-        // Validates a single answer and updates input field color
         private void CheckAnswer(TMP_InputField inputField, string problem)
         {
             bool correct = IsAnswerCorrect(inputField.text.Trim(), problem);
@@ -225,7 +294,6 @@ namespace WrathOfHerndon
                 Debug.Log($"Incorrect. Correct answer for '{problem}' is {problemAnswers[problem]}");
         }
 
-        // Compares user answer to the correct one, handling factoring order-insensitivity
         private bool IsAnswerCorrect(string userAnswer, string problem)
         {
             if (!problemAnswers.TryGetValue(problem, out string correctAnswer))
@@ -233,38 +301,49 @@ namespace WrathOfHerndon
 
             if (problem.StartsWith("Factor:"))
                 return CompareFactors(userAnswer, correctAnswer);
+
             return string.Equals(userAnswer, correctAnswer, StringComparison.OrdinalIgnoreCase);
         }
 
-        // Special comparer for factoring problems: treats order of factors as irrelevant
         private bool CompareFactors(string userAns, string correctAns)
         {
             var userFactors = Regex.Matches(userAns.Replace(" ", ""), "\\([^)]*\\)")
                                    .Cast<Match>().Select(m => m.Value);
             var correctFactors = Regex.Matches(correctAns.Replace(" ", ""), "\\([^)]*\\)")
                                        .Cast<Match>().Select(m => m.Value);
+
             var userMulti = userFactors.GroupBy(f => f).ToDictionary(g => g.Key, g => g.Count());
             var correctMulti = correctFactors.GroupBy(f => f).ToDictionary(g => g.Key, g => g.Count());
-            return userMulti.Count == correctMulti.Count && userMulti.All(kvp => correctMulti.TryGetValue(kvp.Key, out int cnt) && cnt == kvp.Value);
+
+            return userMulti.Count == correctMulti.Count
+                && userMulti.All(kvp => correctMulti.TryGetValue(kvp.Key, out int cnt) && cnt == kvp.Value);
         }
 
-        // Clears displayed problems
         private void ClearProblemTexts()
         {
-            problemText1.text = string.Empty;
-            problemText2.text = string.Empty;
-            problemText3.text = string.Empty;
+            problemText1.text = "";
+            problemText2.text = "";
+            problemText3.text = "";
         }
 
-        // Clears user input fields and resets colors
         private void ClearInputFields()
         {
-            answerInput1.text = string.Empty;
-            answerInput2.text = string.Empty;
-            answerInput3.text = string.Empty;
+            answerInput1.text = "";
+            answerInput2.text = "";
+            answerInput3.text = "";
             answerInput1.image.color = Color.white;
             answerInput2.image.color = Color.white;
             answerInput3.image.color = Color.white;
+        }
+
+        private void OnDestroy()
+        {
+            // Ensure no dangling prompt
+            if (interactionPrompt != null)
+            {
+                interactionPrompt.text = "";
+                interactionPrompt.gameObject.SetActive(false);
+            }
         }
     }
 }
