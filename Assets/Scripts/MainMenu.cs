@@ -1,24 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace WrathOfHerndon
 {
     public class MainMenu : MonoBehaviour
     {
-        public int difficulty = 1;
+        // Made static since we want to read it from any other classes/scenes
+        public static int difficulty = 1;
 
-        // Change difficulty based off of what button is pressed
-        // Difficulty is a number with 1 being low and 3 being high
-        public void Difficulty()
+        public void SetDifficulty(int level)
         {
-            
+            difficulty = Mathf.Clamp(level, 1, 3);
         }
+
         public void PlayGame()
         {
             
+            PlayerPrefs.SetInt("GameDifficulty", difficulty);
+            PlayerPrefs.Save();
+
+            print(difficulty);
             SceneManager.LoadScene(1);
         }
 
