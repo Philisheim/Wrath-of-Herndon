@@ -9,7 +9,7 @@ namespace WrathOfHerndon
         public AudioSource footsteps;
         void Update()
         {
-            if (Input.GetAxis("vertical") != 0.0 | Input.GetAxis("horizontal") != 0.0)
+            if (Input.GetAxis("Vertical") != 0.0 | Input.GetAxis("Horizontal") != 0.0)
             {
                 footsteps.enabled = true;
             }
