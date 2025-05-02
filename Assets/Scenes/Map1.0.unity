@@ -99431,6 +99431,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 566200260901373006, guid: 2e428e053b8ab0241a1d1118543c1726, type: 3}
+      propertyPath: xAxisTurnRate
+      value: 520
+      objectReference: {fileID: 0}
+    - target: {fileID: 566200260901373006, guid: 2e428e053b8ab0241a1d1118543c1726, type: 3}
+      propertyPath: yAxisTurnRate
+      value: 520
+      objectReference: {fileID: 0}
     - target: {fileID: 1682985991570271366, guid: 2e428e053b8ab0241a1d1118543c1726, type: 3}
       propertyPath: Fill
       value: 
