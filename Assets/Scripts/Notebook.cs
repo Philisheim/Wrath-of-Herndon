@@ -27,13 +27,13 @@ namespace WrathOfHerndon
         {
             "Evaluate: limₓ→2 (x² − 4)/(x − 2)",
             "Find: sin(150°)",
-            "Solve for θ: 2cos²θ − 1 = 0 (0 ≤ θ < 2π)",
+            "Solve for θ: 2cos²θ − 1 = 0 (0 ≤ θ < 2pi)",
             "Evaluate: limₓ→0 (sin x)/x",
             "Find: arctan(1)",
             "Find: cos(45°)",
             "Simplify: tan(135°)",
             "Evaluate: limₓ→∞ (2x² + 3)/(x² - 1)",
-            "Solve for θ: sin θ = √2/2 (0 ≤ θ < 2π)"
+            "Solve for θ: sin θ = √2/2 (0 ≤ θ < 2pi)"
         };
         private readonly List<string> calculusProblems = new List<string>()
         {
@@ -76,20 +76,20 @@ namespace WrathOfHerndon
             {"Factor: x² − 9x + 20", "(x-4)(x-5)"},
             {"Simplify: (3x²y)(−2xy³)", "-6x^3y^4"},
             {"Solve for x: 3x - 7 = 2", "3"},
-            {"Solve for x: x² - 4x - 5 = 0", "x=5 or x=-1"},
+            {"Solve for x: x² - 4x - 5 = 0", "5,-1"},
             {"Simplify: (5x³)(-2x²)", "-10x^5"},
             {"Factor: x² - 16", "(x-4)(x+4)"},
             {"Simplify: (4x²y)(3xy²)", "12x^3y^3"},
-            {"Solve for x: |2x - 3| = 5", "x=4 or x=-1"},
+            {"Solve for x: |2x - 3| = 5", "4,-1"},
             {"Evaluate: limₓ→2 (x² − 4)/(x − 2)", "4"},
             {"Find: sin(150°)", "1/2"},
-            {"Solve for θ: 2cos²θ − 1 = 0 (0 ≤ θ < 2π)", "π/4, 3π/4, 5π/4, 7π/4"},
+            {"Solve for θ: 2cos²θ − 1 = 0 (0 ≤ θ < 2pi)", "pi/4, 3pi/4, 5pi/4, 7pi/4"},
             {"Evaluate: limₓ→0 (sin x)/x", "1"},
-            {"Find: arctan(1)", "π/4"},
+            {"Find: arctan(1)", "pi/4"},
             {"Find: cos(45°)", "√2/2"},
             {"Simplify: tan(135°)", "-1"},
             {"Evaluate: limₓ→∞ (2x² + 3)/(x² - 1)", "2"},
-            {"Solve for θ: sin θ = √2/2 (0 ≤ θ < 2π)", "π/4, 3π/4"},
+            {"Solve for θ: sin θ = √2/2 (0 ≤ θ < 2pi)", "pi/4, 3pi/4"},
             {"Solve: d/dx ( x³ · eˣ )", "e^x(3x^2 + x^3)"},
             {"Integrate: ∫ (2x)/(x² + 1) dx", "ln(x^2+1) + C"},
             {"Find critical points: f(x) = x⁴ − 4x² + 1", "x=0, ±√2"},
