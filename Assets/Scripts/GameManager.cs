@@ -33,7 +33,7 @@ namespace WrathOfHerndon
         private void UpdateNotebookUI()
         {
             if (notebookCountText != null)
-                notebookCountText.text = $"Notebooks: {notebooksCollected}";
+                notebookCountText.text = $"Notebooks: {notebooksCollected}/3";
         }
     }
 }
