@@ -154,14 +154,6 @@ namespace WrathOfHerndon
                 lastState = currentState;
             }
 
-            // If we've reached our roamTarget, pick a new one
-            if (currentState == EnemyState.Roaming && !isEnraged
-                && !agent.pathPending
-                && agent.remainingDistance <= agent.stoppingDistance)
-            {
-                SetNewRoamDestination();
-            }
-
             // Fallback: if we've been roaming too long, pick a new one
             if (currentState == EnemyState.Roaming && !isEnraged)
             {
@@ -296,9 +288,29 @@ namespace WrathOfHerndon
         void Roam()
         {
             agent.speed = walkSpeed;
+
+            // when we hit our current roamTarget…
             if (Vector3.Distance(transform.position, roamTarget) < 2f)
-                SetNewRoamDestination();
+            {
+                float roll = Random.value;
+                Debug.Log($"[Herndon Roam] roll = {roll}");
+
+                if (player != null && roll < 1f / 3f)
+                {
+                    // 1-in-3: set the next roamTarget to wherever the player is right now
+                    roamTarget = player.position;
+                    agent.SetDestination(roamTarget);
+                    roamTimer = 0f;
+                }
+                else
+                {
+                    // otherwise pick a totally new wander point
+                    SetNewRoamDestination();
+                }
+            }
         }
+
+
 
         void SetNewRoamDestination()
         {
