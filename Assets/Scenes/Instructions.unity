@@ -392,8 +392,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 127.46448}
-  m_SizeDelta: {x: 1239, y: 388.071}
+  m_AnchoredPosition: {x: 131.3424, y: 55.292816}
+  m_SizeDelta: {x: 1291.6848, y: 394.6566}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &963820412
 MonoBehaviour:
@@ -415,20 +415,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Congratulations, you''ve graduated! You''re going to OU, and your major
-    does not matter. However, it''s now time to tell your teachers where you''re
-    going after your time at Francis Tuttle. You spent time telling your instructors
-    where you''re going, leaving one teacher left: Mrs. Herndon.
-
-    You shudder
-    in fear, recalling what happened the last time someone told her that they were
-    going to OU. Mr Wooden''s old room was wiped from existence, leading him to have
-    to move to Mrs. Voss'' room and Voss having her classes in the lab.
-
-    It''s
-    time to tell her, but you have an idea. If you show her math problems that you''ve
-    completed, maybe her wrath will subside. Your goal is to run around the IT building
-    and finish math problems that you find in notebooks.'
+  m_text: The scores for the math exam came back, and YOU were the only who who failed.
+    Out of anger, Mrs. Herndon kidnaps you and forces you to study in order to escape.
+    Now, the only way to leave is to successfully complete all the math problems
+    correctly.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -455,14 +445,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 45
+  m_fontSizeBase: 45
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -491,7 +481,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 75.73474, z: 256.839, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
