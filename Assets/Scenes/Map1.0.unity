@@ -37901,7 +37901,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 0.77276015
   MaxDistance: 10
   Pan2D: 0
   rolloffMode: 0
@@ -81890,10 +81890,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Herndon (Placeholder)(duh)
       objectReference: {fileID: 0}
+    - target: {fileID: 3663722278740233024, guid: cbd7200f46ef5754eb6d764f8cab4cf8, type: 3}
+      propertyPath: m_Radius
+      value: 0.55
+      objectReference: {fileID: 0}
     - target: {fileID: 5871500630637610708, guid: cbd7200f46ef5754eb6d764f8cab4cf8, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c0dfa54476a92f94a9fce923e72a8999, type: 2}
+      objectReference: {fileID: 2100000, guid: f6b322aeac4265a43b30140732458c4c, type: 2}
     - target: {fileID: 8917360355586493440, guid: cbd7200f46ef5754eb6d764f8cab4cf8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 69.738914
