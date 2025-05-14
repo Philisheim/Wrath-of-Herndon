@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4397644843974930}
   - component: {fileID: 33723429410015806}
   - component: {fileID: 23152084510339772}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Teacher_Chair
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
