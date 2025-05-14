@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 namespace WrathOfHerndon
 {
@@ -28,6 +29,11 @@ namespace WrathOfHerndon
         {
             notebooksCollected++;
             UpdateNotebookUI();
+            if (notebooksCollected >= 3)
+            {
+                SceneManager.LoadScene(3);
+                Cursor.lockState = CursorLockMode.Confined;
+            }
         }
 
         private void UpdateNotebookUI()

@@ -218,7 +218,7 @@ RectTransform:
   m_GameObject: {fileID: 402522778}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1655990627}
@@ -392,7 +392,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 131.3424, y: 55.292816}
+  m_AnchoredPosition: {x: 131.3424, y: 193}
   m_SizeDelta: {x: 1291.6848, y: 394.6566}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &963820412
@@ -415,10 +415,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: The scores for the math exam came back, and YOU were the only who who failed.
+  m_text: The scores for the math exam came back, and YOU were the only one who failed.
     Out of anger, Mrs. Herndon kidnaps you and forces you to study in order to escape.
-    Now, the only way to leave is to successfully complete all the math problems
-    correctly.
+    Now, the only way to leave is to successfully complete all the math problems.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -445,8 +444,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 45
-  m_fontSizeBase: 45
+  m_fontSize: 56
+  m_fontSizeBase: 56
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -481,7 +480,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 75.73474, z: 256.839, w: 0}
+  m_margin: {x: -196.43115, y: 75.73474, z: 35.632812, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
