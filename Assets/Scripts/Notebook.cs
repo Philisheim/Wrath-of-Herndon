@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -283,7 +284,7 @@ namespace WrathOfHerndon
             // close, collect, and destroy
             ToggleCanvas();
             GameManager.Instance.AddNotebook();
-            Destroy(gameObject, 1.0f);
+            Destroy(gameObject);
         }
 
         private void CheckAnswer(TMP_InputField inputField, string problem)
