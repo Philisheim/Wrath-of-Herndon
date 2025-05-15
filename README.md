@@ -70,4 +70,4 @@ Using **Unity** and **Github**:
 ## Video Links
 - #### [Trailer](https://www.kapwing.com/6824d96d42f245732df10293/studio/editor/sharing)
 - #### [How to play](https://www.kapwing.com/682539abe650099fc4b0bfd0/studio/editor)
-- #### [How I (we) did this](https://www.loom.com/share/5f3df5ab9adf45469f381de1b267459f?sid=25b827bb-49fd-47c0-a1f6-de7c17bb4d03)
+- #### [Behind the scenes for the notebook programming (for the *nerds*)](https://www.loom.com/share/5f3df5ab9adf45469f381de1b267459f?sid=25b827bb-49fd-47c0-a1f6-de7c17bb4d03)
