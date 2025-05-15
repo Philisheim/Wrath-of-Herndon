@@ -5,7 +5,7 @@ _The scores for the math exam came back, and **YOU** were the only one who faile
 
 Outraged and disappointed, Mrs. Herndon takes matters into her own hands and **kidnaps you**, locking you inside the school to force you to study. There's only one way out: **solve every math problem she throws at you.**
 
-This is not just about escaping a classroom — it's about conquering the subject that once defeated you. Welcome to *Wrath of Herndon* — a math-powered escape-style game.
+This is not just about escaping a classroom — it's about conquering the subject that once defeated you. Welcome to *Wrath of Herndon* — a math-powered escape-style horror game.
 
 ## Game Objective
 To escape, the player must complete a series of math problems across the level of chosen difficulty:
@@ -17,12 +17,13 @@ To escape, the player must complete a series of math problems across the level o
 Each successful solution brings you one step closer to freedom. Can you prove your math skills and escape Mrs. Herndon's clutches?
 
 ## Gameplay
+> [!WARNING]
+> Spooky
 - Presented with a series of math problems.
 - Enter correct answers into the provided fields.
 - Problems vary in type based on difficulty: algebraic equations, limits, trigonometry, and calculus.
 - Get all answers correct to unlock the ending.
 - Don't get caught by Mrs. Herndon
-- Spooky
 > [!TIP]
 > Due to how the player is programmed, moving diagonally will allow you to move faster than normal.
 
